@@ -51,7 +51,7 @@ Ce crate **n'en duplique aucun**. Il ajoute uniquement les primitives que le dri
 ```toml
 [dependencies]
 embassy-ssd1306          = "0.6.0"
-embassy-ssd1306-graphics = "0.2.0"
+embassy-ssd1306-graphics = "0.1.0"
 ```
 
 ---
@@ -200,7 +200,7 @@ Trace le contour d'un triangle via trois appels à `line()`.
 
 ## Exemples
 
-### Animation — bras rotatif (avec `embedded-trig-f32`)
+### Animation bras rotatif (avec `embedded-trig-f32`)
 
 ```rust
 use embedded_trig_f32::{sin, cos};
