@@ -35,7 +35,7 @@ dependencies = [
 
 [[package]]
 name = "embassy-ssd1306-graphics"
-version = "0.2.0"
+version = "0.1.0"
 dependencies = [
  "embassy-ssd1306",
  "embedded-hal-async",

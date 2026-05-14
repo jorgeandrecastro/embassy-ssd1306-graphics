@@ -32,6 +32,9 @@ Ce crate **n'en duplique aucun**. Il ajoute uniquement les primitives que le dri
 | `circle()` | Midpoint integer-only | Cercle contour |
 | `fill_circle()` | Midpoint + hlines | Disque plein |
 | `triangle()` | 3 × `line()` | Triangle contour |
+| `ellipse()` | Midpoint généralisé | Contour d'ellipse |
+| `bezier_quad()` | De Casteljau integer-only | Courbe de Bézier quadratique |
+| `fill_triangle()` | Scanline integer-only | Triangle plein |
 
 ---
 
@@ -63,7 +66,7 @@ embassy-ssd1306-graphics = "0.1.0"
 #![no_main]
 
 use embassy_ssd1306::Ssd1306;
-use embassy_ssd1306_graphics::{Graphics, circle, line, triangle};
+use embassy_ssd1306_graphics::{Graphics, circle, ellipse, fill_triangle, line, triangle, bezier_quad};
 
 #[embassy_executor::main]
 async fn main(_spawner: embassy_executor::Spawner) {
@@ -81,7 +84,9 @@ async fn main(_spawner: embassy_executor::Spawner) {
             // Primitives de ce crate
             line(&mut gfx, 0, 0, 127, 63, true);
             circle(&mut gfx, 64, 32, 20, true);
-            triangle(&mut gfx, 64, 4, 20, 59, 108, 59, true);
+            ellipse(&mut gfx, 64, 32, 40, 16, true);
+            fill_triangle(&mut gfx, 64, 4, 20, 59, 108, 59, true);
+            bezier_quad(&mut gfx, 10, 50, 64, 5, 118, 50, 24, true);
         }
         // ↑ borrow libéré oled à nouveau accessible
 
@@ -198,6 +203,54 @@ Trace le contour d'un triangle via trois appels à `line()`.
 
 ---
 
+### `ellipse`
+
+```rust
+pub fn ellipse<I: I2c>(
+    gfx: &mut Graphics<'_, I>,
+    cx: i32, cy: i32,
+    rx: i32, ry: i32,
+    on: bool,
+)
+```
+
+Trace le contour d'une ellipse. Algorithme midpoint généralisé, integer-only.
+
+---
+
+### `bezier_quad`
+
+```rust
+pub fn bezier_quad<I: I2c>(
+    gfx: &mut Graphics<'_, I>,
+    x0: i32, y0: i32,
+    x1: i32, y1: i32,
+    x2: i32, y2: i32,
+    steps: i32,
+    on: bool,
+)
+```
+
+Trace une courbe de Bézier quadratique via De Casteljau integer-only.
+
+---
+
+### `fill_triangle`
+
+```rust
+pub fn fill_triangle<I: I2c>(
+    gfx: &mut Graphics<'_, I>,
+    x0: i32, y0: i32,
+    x1: i32, y1: i32,
+    x2: i32, y2: i32,
+    on: bool,
+)
+```
+
+Remplit un triangle plein par scanline integer-only.
+
+---
+
 ## Exemples
 
 ### Animation bras rotatif (avec `embedded-trig-f32`)
@@ -244,21 +297,6 @@ oled.draw_filled_rect(11, 29, filled, 6, true);
 
 Testé sur : **RP2040**, **RP2350**, (via Embassy).
 
----
-
-## Changelog
-
-### 0.2.0
-
-- Ajout `fill_circle()`: disque plein via balayage hlines midpoint
-- Ajout `triangle()` : contour 3 sommets via Bresenham
-- Suppression de toute duplication avec `embassy-ssd1306` :
-  police, hline, vline, rect, fill_rect retirés (déjà dans le driver)
-- Documentation clarifiée : rôle exact du crate vs driver
-
-### 0.1.0
-
-- Version initiale : `line`, `rect`, `fill_rect`, `circle`
 
 ---
 
