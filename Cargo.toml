@@ -1,0 +1,23 @@
+[package]
+name          = "embassy-ssd1306-graphics"
+version       = "0.2.0"
+edition       = "2024"
+authors       = ["Jorge Andre Castro <georgeandrec@gmail.com>"]
+license       = "GPL-2.0-or-later"
+description   = "Primitives graphiques no_std pour embassy-ssd1306 : ligne Bresenham, cercle midpoint, triangle  zéro unsafe, zéro alloc"
+repository    = "https://github.com/jorgeandrecastro/embassy-ssd1306-graphics"
+documentation = "https://docs.rs/embassy-ssd1306-graphics"
+readme        = "README.md"
+keywords      = ["embedded", "graphics", "ssd1306", "no-std", "oled"]
+categories    = ["embedded", "no-std", "graphics"]
+
+[dependencies]
+embassy-ssd1306    = "0.6.0"
+embedded-hal-async = "1.0"
+
+[profile.release]
+opt-level     =  "z"
+lto           = true  # Link-Time Optimization
+codegen-units = 1
+panic         = "abort"
+strip         = true
