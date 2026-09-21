@@ -1,6 +1,6 @@
 [package]
 name          = "embassy-ssd1306-graphics"
-version       = "0.1.0"
+version       = "0.2.0"
 edition       = "2024"
 authors       = ["Jorge Andre Castro <georgeandrec@gmail.com>"]
 license       = "GPL-2.0-or-later"
@@ -12,7 +12,7 @@ keywords      = ["embedded", "graphics", "ssd1306", "no-std", "oled"]
 categories    = ["embedded", "no-std", "graphics"]
 
 [dependencies]
-embassy-ssd1306    = "0.6.0"
+embassy-ssd1306    = "0.7.0"
 embedded-hal-async = "1.0"
 
 [profile.release]

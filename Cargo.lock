@@ -25,9 +25,9 @@ dependencies = [
 
 [[package]]
 name = "embassy-ssd1306"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3dc38fb80d2710a47ea9a7b2a7692761c98469f610941af01236197c048eac27"
+checksum = "d469f4dfb6e3c640d2da4e169bb66d1efea3256db0f61db72747e487259ff229"
 dependencies = [
  "embassy-time",
  "embedded-hal-async",
@@ -35,7 +35,7 @@ dependencies = [
 
 [[package]]
 name = "embassy-ssd1306-graphics"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "embassy-ssd1306",
  "embedded-hal-async",

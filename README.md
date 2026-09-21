@@ -53,8 +53,8 @@ Ce crate **n'en duplique aucun**. Il ajoute uniquement les primitives que le dri
 
 ```toml
 [dependencies]
-embassy-ssd1306          = "0.6.0"
-embassy-ssd1306-graphics = "0.1.0"
+embassy-ssd1306          = "0.7"
+embassy-ssd1306-graphics = "0.2"
 ```
 
 ---
@@ -88,7 +88,7 @@ async fn main(_spawner: embassy_executor::Spawner) {
             fill_triangle(&mut gfx, 64, 4, 20, 59, 108, 59, true);
             bezier_quad(&mut gfx, 10, 50, 64, 5, 118, 50, 24, true);
         }
-        // ↑ borrow libéré oled à nouveau accessible
+        // ↑ borrow libéré — oled à nouveau accessible
 
         // Texte et flush via le driver directement
         oled.draw_str(40, 7, b"Hello!");
@@ -123,6 +123,10 @@ async fn main(_spawner: embassy_executor::Spawner) {
 └─────────────────────────────────────────┘
 ```
 
+Ce crate est lui-même découpé en modules (`context`, `line`, `circle`, `triangle`,
+`ellipse`, `bezier`), chacun ne contenant que l'algorithme correspondant. Voir la
+doc de crate (`cargo doc --open`) pour le détail du découpage.
+
 ---
 
 ## API
@@ -152,7 +156,7 @@ pub fn line<I: I2c>(
 ```
 
 Trace une ligne entre deux points quelconques.  
-Algorithme de **Bresenham** integer-only  aucune division flottante, safe sans FPU.
+Algorithme de **Bresenham** integer-only : aucune division flottante, safe sans FPU.
 
 ---
 
@@ -168,7 +172,7 @@ pub fn circle<I: I2c>(
 ```
 
 Trace le contour d'un cercle.  
-Algorithme **midpoint** 8-octants 8 pixels symétriques par itération.
+Algorithme **midpoint** 8-octants : 8 pixels symétriques par itération.
 
 ---
 
@@ -291,12 +295,21 @@ oled.draw_filled_rect(11, 29, filled, 6, true);
 
 | Crate | Version |
 |---|---|
-| `embassy-ssd1306` | 0.6.0 |
+| `embassy-ssd1306` | 0.7.0 |
 | `embedded-hal-async` | 1.0 |
 | Rust edition | 2024 |
 
 Testé sur : **RP2040**, **RP2350**, (via Embassy).
 
+---
+
+## 📋 Historique (Changelog)
+
+**v0.2.0** : découpage modulaire du crate (`context`, `line`, `circle`, `triangle`,
+`ellipse`, `bezier`), mise à jour de la dépendance `embassy-ssd1306` vers `0.7.0`.
+
+**v0.1.0** : version initiale  `line`, `circle`, `fill_circle`, `triangle`,
+`fill_triangle`, `ellipse`, `bezier_quad`.
 
 ---
 
@@ -309,4 +322,4 @@ Voir [LICENSE](LICENSE) pour le texte complet.
 
 ## Auteur
 
-**Jorge Andre Castro** 
+**Jorge Andre Castro**
