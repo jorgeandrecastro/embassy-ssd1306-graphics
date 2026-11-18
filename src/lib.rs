@@ -2,44 +2,44 @@
 #![forbid(unsafe_code)]
 //! # embassy-ssd1306-graphics
 //!
-//! Couche graphique 2D `no_std` pour écrans OLED SSD1306 (128×64),
-//! construite au-dessus de `embassy-ssd1306`.
+//! `no_std` 2D graphics layer for SSD1306 OLED displays (128×64),
+//! built on top of `embassy-ssd1306`.
 //!
-//! ## Rôle exact de ce crate
+//! ## What this crate does
 //!
-//! Le driver `embassy-ssd1306` fournit déjà :
+//! The `embassy-ssd1306` driver already provides:
 //! - `draw_pixel()`, `draw_hline()`, `draw_vline()`
 //! - `draw_rect()`, `draw_filled_rect()`
 //! - `draw_char()`, `draw_str()`, `draw_i16()`
 //! - `draw_bitmap()`
 //! - `clear()`, `fill()`, `flush()`
 //!
-//! Ce crate **ne duplique rien**. Il ajoute uniquement les primitives
-//! que le driver ne propose pas :
-//! | Fonction              | Algorithme                 | Fichier        |
+//! This crate **does not duplicate anything**. It only adds primitives
+//! that the driver does not provide:
+//! | Function              | Algorithm                  | File           |
 //! |------------------------|-----------------------------|----------------|
-//! | [`line()`]              | Bresenham integer-only      | `line.rs`      |
-//! | [`circle()`]            | Midpoint integer-only       | `circle.rs`    |
+//! | [`line()`]              | Integer-only Bresenham      | `line.rs`      |
+//! | [`circle()`]            | Integer-only midpoint       | `circle.rs`    |
 //! | [`fill_circle()`]       | Midpoint + hlines           | `circle.rs`    |
-//! | [`triangle()`]          | 3 appels à [`line()`]       | `triangle.rs`  |
-//! | [`ellipse()`]           | Midpoint généralisé         | `ellipse.rs`   |
-//! | [`bezier_quad()`]       | De Casteljau integer-only   | `bezier.rs`    |
-//! | [`fill_triangle()`]     | Scanline integer-only       | `triangle.rs`  |
+//! | [`triangle()`]          | 3 calls to [`line()`]       | `triangle.rs`  |
+//! | [`ellipse()`]           | Generalized midpoint        | `ellipse.rs`   |
+//! | [`bezier_quad()`]       | Integer-only De Casteljau   | `bezier.rs`    |
+//! | [`fill_triangle()`]     | Integer-only scanline       | `triangle.rs`  |
 //!
-//! Les modules (`line`, `circle`, `triangle`, `ellipse`, `bezier`) sont un
-//! simple découpage interne du fichier source : ils restent privés et ne font
-//! pas partie de l'API publique, seules les fonctions ci-dessus sont exportées.
+//! The modules (`line`, `circle`, `triangle`, `ellipse`, `bezier`) are an
+//! internal organization of the source files: they remain private and are not
+//! part of the public API; only the functions listed above are exported.
 //! ## Architecture
 //!
 //! ```text
 //! ┌──────────────────────────────────────┐
-//! │          Votre application           │
+//! │          Your application            │
 //! │  line() / circle() / triangle() …   │
-//! │  oled.draw_str() / oled.draw_i16()  │  ← driver direct pour le texte
+//! │  oled.draw_str() / oled.draw_i16()  │  ← driver directly for text
 //! └──────────┬───────────────────────────┘
 //!            │ &mut Graphics       │ &mut Ssd1306
 //! ┌──────────▼───────────┐         │
-//! │  Graphics (ce crate) │         │
+//! │  Graphics (this crate)│         │
 //! │  clipping · pixel()  │         │
 //! └──────────┬───────────┘         │
 //!            └─────────────────────┘
@@ -50,24 +50,24 @@
 //! └──────────────────────────────────────┘
 //! ```
 //!
-//! ## Découpage des fichiers
+//! ## File layout
 //!
 //! ```text
 //! src/
-//! ├── lib.rs        doc de crate, déclaration des modules, ré-exports
-//! ├── context.rs    Graphics<'a, I> : new, pixel (clipping)
+//! ├── lib.rs         crate docs, module declarations, re-exports
+//! ├── context.rs     Graphics<'a, I>: new, pixel (clipping)
 //! ├── line.rs        line()               (Bresenham)
-//! ├── circle.rs       circle(), fill_circle() (Midpoint)
-//! ├── triangle.rs      triangle(), fill_triangle() (3×line / scanline)
-//! ├── ellipse.rs       ellipse()            (Midpoint généralisé)
-//! └── bezier.rs        bezier_quad()         (De Casteljau)
+//! ├── circle.rs      circle(), fill_circle() (midpoint)
+//! ├── triangle.rs    triangle(), fill_triangle() (3×line / scanline)
+//! ├── ellipse.rs     ellipse()            (generalized midpoint)
+//! └── bezier.rs      bezier_quad()         (De Casteljau)
 //! ```
 //!
-//! ## Patron de borrow
+//! ## Borrowing pattern
 //!
-//! `Graphics` tient un `&mut Ssd1306` pour toute sa durée de vie.
-//! Pour appeler `oled.flush()`, `oled.clear()` ou `oled.draw_str()`,
-//! `gfx` doit être sorti de portée au préalable.
+//! `Graphics` holds a `&mut Ssd1306` for its entire lifetime.
+//! To call `oled.flush()`, `oled.clear()`, or `oled.draw_str()`,
+//! `gfx` must first go out of scope.
 //!
 //! ```rust,no_run
 //! loop {
@@ -76,7 +76,7 @@
 //!         let mut gfx = Graphics::new(&mut oled);
 //!         line(&mut gfx, 0, 0, 127, 63, true);
 //!         circle(&mut gfx, 64, 32, 20, true);
-//!     } // ← borrow libéré
+//!     } // ← borrow released
 //!     oled.draw_str(40, 3, b"RPi2350");
 //!     oled.flush().await.unwrap();
 //! }

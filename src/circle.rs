@@ -3,16 +3,16 @@
 use crate::Graphics;
 use embedded_hal_async::i2c::I2c;
 
-/// Trace le **contour** d'un cercle.
+/// Draws a circle **outline**.
 ///
-/// **Algorithme :** midpoint circle integer-only.
-/// Exploite la symétrie 8-octants : chaque itération dessine 8 pixels
-/// symétriques, ce qui minimise le nombre d'appels à `pixel()`.
+/// **Algorithm:** integer-only midpoint circle.
+/// Uses 8-octant symmetry: each iteration draws 8 symmetric pixels,
+/// minimizing the number of calls to `pixel()`.
 ///
-/// # Paramètres
+/// # Parameters
 ///
-/// - `(cx, cy)` : centre
-/// - `r` : rayon en pixels
+/// - `(cx, cy)`: center
+/// - `r`: radius in pixels
 ///
 /// # Exemple
 ///
@@ -48,11 +48,11 @@ pub fn circle<I: I2c>(gfx: &mut Graphics<'_, I>, cx: i32, cy: i32, r: i32, on: b
     }
 }
 
-/// **Remplit** un cercle (disque plein).
+/// **Fills** a circle (solid disk).
 ///
-/// Utilise le même algorithme midpoint, mais dessine des lignes
-/// horizontales entre les points symétriques à chaque rangée.
-/// Beaucoup plus rapide que d'appeler `circle()` en spirale.
+/// Uses the same midpoint algorithm, but draws horizontal lines
+/// between symmetric points on each row.
+/// Much faster than drawing `circle()` as a spiral.
 ///
 /// # Exemple
 ///
@@ -69,7 +69,7 @@ pub fn fill_circle<I: I2c>(gfx: &mut Graphics<'_, I>, cx: i32, cy: i32, r: i32, 
     let mut err = 0;
 
     while x >= y {
-        // Lignes horizontales symétriques (haut/bas, gauche/droite)
+        // Symmetric horizontal lines (top/bottom, left/right)
         for px in (cx - x)..=(cx + x) {
             gfx.pixel(px, cy + y, on);
             gfx.pixel(px, cy - y, on);

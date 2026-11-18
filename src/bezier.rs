@@ -1,27 +1,27 @@
-//! Courbe de Bézier quadratique  De Casteljau integer-only.
+//! Quadratic Bézier curve using integer-only De Casteljau.
 
 use crate::{line, Graphics};
 use embedded_hal_async::i2c::I2c;
 
-/// Trace une **courbe de Bézier quadratique** (3 points de contrôle).
+/// Draws a **quadratic Bézier curve** (3 control points).
 ///
-/// **Algorithme :** De Casteljau integer-only avec subdivision fixe.
-/// `steps` contrôle la finesse du tracé (16–32 suffisent pour 128×64).
+/// **Algorithm:** integer-only De Casteljau with a fixed number of subdivisions.
+/// `steps` controls the curve's smoothness (16–32 is enough for 128×64).
 ///
-/// Les interpolations sont faites en entiers avec précision ×1024
-/// pour éviter tout flottant.
+/// Interpolations use integer arithmetic with ×1024 precision
+/// to avoid floating-point operations.
 ///
-/// # Paramètres
+/// # Parameters
 ///
-/// - `(x0, y0)` : point de départ
-/// - `(x1, y1)` : point de contrôle
-/// - `(x2, y2)` : point d'arrivée
-/// - `steps` : nombre de segments (recommandé : 16 à 32)
+/// - `(x0, y0)`: start point
+/// - `(x1, y1)`: control point
+/// - `(x2, y2)`: end point
+/// - `steps`: number of segments (recommended: 16 to 32)
 ///
 /// # Exemple
 ///
 /// ```rust,no_run
-/// bezier_quad(&mut gfx, 10, 50, 64, 5, 118, 50, 24, true); // arche
+/// bezier_quad(&mut gfx, 10, 50, 64, 5, 118, 50, 24, true); // arch
 /// ```
 pub fn bezier_quad<I: I2c>(
     gfx: &mut Graphics<'_, I>,
@@ -39,11 +39,11 @@ pub fn bezier_quad<I: I2c>(
     let mut py = y0;
 
     for i in 1..=steps {
-        // t = i / steps en virgule fixe ×1024
+        // t = i / steps in fixed-point ×1024
         let t  = (i * 1024) / steps;         // t  ∈ [0, 1024]
         let t1 = 1024 - t;                   // 1-t
 
-        // B(t) = (1-t)²·P0 + 2(1-t)t·P1 + t²·P2  (tout ×1024²)
+        // B(t) = (1-t)²·P0 + 2(1-t)t·P1 + t²·P2 (all scaled by 1024²)
         let nx = (t1 * t1 * x0 + 2 * t1 * t * x1 + t * t * x2) / (1024 * 1024);
         let ny = (t1 * t1 * y0 + 2 * t1 * t * y1 + t * t * y2) / (1024 * 1024);
 

@@ -1,10 +1,10 @@
 [package]
 name          = "embassy-ssd1306-graphics"
-version       = "0.2.0"
+version       = "0.2.1"
 edition       = "2024"
 authors       = ["Jorge Andre Castro <georgeandrec@gmail.com>"]
 license       = "GPL-2.0-or-later"
-description   = "Primitives graphiques no_std pour écrans OLED SSD1306, ajoutant lignes, cercles, ellipses, triangles et courbes Bézier sans unsafe ni allocation"
+description   = "no_std graphics primitives for SSD1306 OLED displays, adding lines, circles, ellipses, triangles, and Bézier curves without unsafe code or allocation"
 repository    = "https://github.com/jorgeandrecastro/embassy-ssd1306-graphics"
 documentation = "https://docs.rs/embassy-ssd1306-graphics"
 readme        = "README.md"
@@ -12,12 +12,12 @@ keywords      = ["embedded", "graphics", "ssd1306", "no-std", "oled"]
 categories    = ["embedded", "no-std", "graphics"]
 
 [dependencies]
-embassy-ssd1306    = "0.7.0"
+embassy-ssd1306    = "0.7"
 embedded-hal-async = "1.0"
 
 [profile.release]
 opt-level     =  "z"
-lto           = true  # Link-Time Optimization
+lto           = true
 codegen-units = 1
 panic         = "abort"
 strip         = true

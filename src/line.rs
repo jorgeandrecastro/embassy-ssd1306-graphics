@@ -1,18 +1,18 @@
-//! Tracé de ligne  Bresenham integer-only.
+//! Line drawing with integer-only Bresenham.
 
 use crate::Graphics;
 use embedded_hal_async::i2c::I2c;
 
-/// Trace une ligne entre `(x0, y0)` et `(x1, y1)`.
+/// Draws a line between `(x0, y0)` and `(x1, y1)`.
 ///
-/// **Algorithme :** Bresenham integer-only.
-/// Zéro division flottante, zéro multiplication, safe sur tout MCU sans FPU.
+/// **Algorithm:** integer-only Bresenham.
+/// No floating-point division, no multiplication; safe on any MCU without an FPU.
 ///
 /// # Exemple
 ///
 /// ```rust,no_run
-/// line(&mut gfx, 0, 0, 127, 63, true);  // diagonale complète
-/// line(&mut gfx, 0, 0, 127, 63, false); // efface la diagonale
+/// line(&mut gfx, 0, 0, 127, 63, true);  // draw the full diagonal
+/// line(&mut gfx, 0, 0, 127, 63, false); // erase the diagonal
 /// ```
 pub fn line<I: I2c>(
     gfx: &mut Graphics<'_, I>,

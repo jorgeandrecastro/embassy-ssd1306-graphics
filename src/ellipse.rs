@@ -1,24 +1,24 @@
-//! Ellipse  midpoint ellipse algorithm (Bresenham généralisé).
+//! Ellipse drawing with the midpoint ellipse algorithm (generalized Bresenham).
 
 use crate::Graphics;
 use embedded_hal_async::i2c::I2c;
 
-/// Trace le **contour** d'une ellipse.
+/// Draws an ellipse **outline**.
 ///
-/// **Algorithme :** midpoint ellipse integer-only (Bresenham généralisé).
-/// Deux phases : région 1 (pente < -1) puis région 2 (pente > -1).
+/// **Algorithm:** integer-only midpoint ellipse (generalized Bresenham).
+/// Two phases: region 1 (slope < -1), then region 2 (slope > -1).
 ///
-/// # Paramètres
+/// # Parameters
 ///
-/// - `(cx, cy)` : centre
-/// - `rx` : demi-axe horizontal
-/// - `ry` : demi-axe vertical
+/// - `(cx, cy)`: center
+/// - `rx`: horizontal semi-axis
+/// - `ry`: vertical semi-axis
 ///
 /// # Exemple
 ///
 /// ```rust,no_run
-/// ellipse(&mut gfx, 64, 32, 40, 20, true); // ellipse large
-/// ellipse(&mut gfx, 64, 32, 10, 10, true); // cercle (rx == ry)
+/// ellipse(&mut gfx, 64, 32, 40, 20, true); // wide ellipse
+/// ellipse(&mut gfx, 64, 32, 10, 10, true); // circle (rx == ry)
 /// ```
 pub fn ellipse<I: I2c>(gfx: &mut Graphics<'_, I>, cx: i32, cy: i32, rx: i32, ry: i32, on: bool) {
     if rx <= 0 || ry <= 0 {
@@ -32,7 +32,7 @@ pub fn ellipse<I: I2c>(gfx: &mut Graphics<'_, I>, cx: i32, cy: i32, rx: i32, ry:
     let mut x = 0i32;
     let mut y = ry;
 
-    // Région 1
+    // Region 1
     let mut d1 = ry2 - rx2 * ry + rx2 / 4;
     let mut dx = 2 * ry2 * x;
     let mut dy = 2 * rx2 * y;
@@ -54,7 +54,7 @@ pub fn ellipse<I: I2c>(gfx: &mut Graphics<'_, I>, cx: i32, cy: i32, rx: i32, ry:
         }
     }
 
-    // Région 2
+    // Region 2
     let mut d2 = ry2 * (x * x + x) + rx2 * (y * y - 2 * y + 1) - rx2 * ry2 + rx2;
 
     while y >= 0 {

@@ -6,46 +6,46 @@
 [![no_std](https://img.shields.io/badge/no__std-✓-green)](https://docs.rust-embedded.org/book/)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 
-Primitives graphiques `no_std` pour écrans OLED SSD1306,
-construites au-dessus de [`embassy-ssd1306`](https://crates.io/crates/embassy-ssd1306).
+`no_std` graphics primitives for SSD1306 OLED displays,
+built on top of [`embassy-ssd1306`](https://crates.io/crates/embassy-ssd1306).
 
 ---
 
-## Rôle exact de ce crate
+## What this crate does
 
-Le driver `embassy-ssd1306` fournit déjà :
+The `embassy-ssd1306` driver already provides:
 
-| Déjà dans le driver | Utilisation |
+| Already in the driver | Use |
 |---|---|
-| `draw_pixel()` | Pixel individuel |
-| `draw_hline()` / `draw_vline()` | Lignes directionnelles |
+| `draw_pixel()` | Individual pixels |
+| `draw_hline()` / `draw_vline()` | Horizontal and vertical lines |
 | `draw_rect()` / `draw_filled_rect()` | Rectangles |
-| `draw_char()` / `draw_str()` / `draw_i16()` | Texte et nombres |
-| `draw_bitmap()` | Bitmap 1bpp |
-| `clear()` / `fill()` / `flush()` | Framebuffer et I2C |
+| `draw_char()` / `draw_str()` / `draw_i16()` | Text and numbers |
+| `draw_bitmap()` | 1bpp bitmap |
+| `clear()` / `fill()` / `flush()` | Framebuffer and I2C |
 
-Ce crate **n'en duplique aucun**. Il ajoute uniquement les primitives que le driver ne propose pas :
+This crate **does not duplicate any of these**. It only adds primitives that the driver does not provide:
 
-| Fonction | Algorithme | Apport |
+| Function | Algorithm | Adds |
 |---|---|---|
-| `line()` | Bresenham integer-only | Lignes obliques quelconques |
-| `circle()` | Midpoint integer-only | Cercle contour |
-| `fill_circle()` | Midpoint + hlines | Disque plein |
-| `triangle()` | 3 × `line()` | Triangle contour |
-| `ellipse()` | Midpoint généralisé | Contour d'ellipse |
-| `bezier_quad()` | De Casteljau integer-only | Courbe de Bézier quadratique |
-| `fill_triangle()` | Scanline integer-only | Triangle plein |
+| `line()` | Integer-only Bresenham | Arbitrary diagonal lines |
+| `circle()` | Integer-only midpoint | Circle outline |
+| `fill_circle()` | Midpoint + horizontal lines | Filled disk |
+| `triangle()` | 3 × `line()` | Triangle outline |
+| `ellipse()` | Generalized midpoint | Ellipse outline |
+| `bezier_quad()` | Integer-only De Casteljau | Quadratic Bézier curve |
+| `fill_triangle()` | Integer-only scanline | Filled triangle |
 
 ---
 
-## Philosophie
+## Design principles
 
-| Principe | Détail |
+| Principle | Details |
 |---|---|
-| Zéro duplication | Délègue tout ce que le driver sait faire |
-| Zéro allocation | Pas de `Vec`, pas de `Box` |
-| Integer-only | Aucun flottant dans les algorithmes |
-| `#![forbid(unsafe_code)]` | Garanti à la compilation |
+| No duplication | Delegates everything the driver can already do |
+| No allocation | No `Vec`, no `Box` |
+| Integer-only | No floating-point arithmetic in the algorithms |
+| `#![forbid(unsafe_code)]` | Enforced at compile time |
 
 ---
 
@@ -59,7 +59,7 @@ embassy-ssd1306-graphics = "0.2"
 
 ---
 
-## Démarrage rapide
+## Quick start
 
 ```rust
 #![no_std]
@@ -70,7 +70,7 @@ use embassy_ssd1306_graphics::{Graphics, circle, ellipse, fill_triangle, line, t
 
 #[embassy_executor::main]
 async fn main(_spawner: embassy_executor::Spawner) {
-    let i2c = /* initialisation I2C selon votre MCU */;
+    let i2c = /* initialize I2C for your MCU */;
 
     let mut oled = Ssd1306::new(i2c, 0x3C);
     oled.init().await.unwrap();
@@ -81,25 +81,25 @@ async fn main(_spawner: embassy_executor::Spawner) {
         {
             let mut gfx = Graphics::new(&mut oled);
 
-            // Primitives de ce crate
+            // Primitives from this crate
             line(&mut gfx, 0, 0, 127, 63, true);
             circle(&mut gfx, 64, 32, 20, true);
             ellipse(&mut gfx, 64, 32, 40, 16, true);
             fill_triangle(&mut gfx, 64, 4, 20, 59, 108, 59, true);
             bezier_quad(&mut gfx, 10, 50, 64, 5, 118, 50, 24, true);
         }
-        // ↑ borrow libéré — oled à nouveau accessible
+        // ↑ borrow released — oled is accessible again
 
-        // Texte et flush via le driver directement
+        // Draw text and flush directly through the driver
         oled.draw_str(40, 7, b"Hello!");
         oled.flush().await.unwrap();
     }
 }
 ```
 
-> **⚠ Borrow** : `Graphics` tient un borrow mutable exclusif sur `oled`.
-> Encadrez-le dans un bloc `{}` pour pouvoir appeler `oled.draw_str()`,
-> `oled.clear()` et `oled.flush()` en dehors.
+> **⚠ Borrowing**: `Graphics` holds an exclusive mutable borrow of `oled`.
+> Wrap it in a `{}` block so you can call `oled.draw_str()`,
+> `oled.clear()`, and `oled.flush()` outside the block.
 
 ---
 
@@ -107,25 +107,25 @@ async fn main(_spawner: embassy_executor::Spawner) {
 
 ```
 ┌──────────────────────────────────────────┐
-│            Votre application             │
-│  line() / circle() / triangle()          │  ← ce crate
-│  oled.draw_str() / oled.draw_i16() …     │  ← driver direct
+│            Your application              │
+│  line() / circle() / triangle()          │  ← this crate
+│  oled.draw_str() / oled.draw_i16() …     │  ← driver directly
 └──────────┬───────────────────────────────┘
            │ &mut Graphics
 ┌──────────▼──────────────┐
-│  Graphics (ce crate)    │
-│  clipping i32 · pixel() │
+│  Graphics (this crate)  │
+│  i32 clipping · pixel() │
 └──────────┬──────────────┘
            │ draw_pixel(u8, u8)
 ┌──────────▼──────────────────────────────┐
-│       embassy-ssd1306 (driver)          │
-│  framebuffer · I2C · flush()            │
+│       embassy-ssd1306 (driver)           │
+│  framebuffer · I2C · flush()             │
 └─────────────────────────────────────────┘
 ```
 
-Ce crate est lui-même découpé en modules (`context`, `line`, `circle`, `triangle`,
-`ellipse`, `bezier`), chacun ne contenant que l'algorithme correspondant. Voir la
-doc de crate (`cargo doc --open`) pour le détail du découpage.
+This crate is itself divided into modules (`context`, `line`, `circle`, `triangle`,
+`ellipse`, `bezier`), each containing only its corresponding algorithm. See the
+crate documentation (`cargo doc --open`) for details on the module layout.
 
 ---
 
@@ -134,11 +134,11 @@ doc de crate (`cargo doc --open`) pour le détail du découpage.
 ### `Graphics<'a, I>`
 
 ```rust
-/// Crée le contexte graphique.
+/// Creates the graphics context.
 pub fn new(display: &'a mut Ssd1306<I>) -> Self
 
-/// Pixel individuel avec clipping i32 automatique.
-/// Coordonnées hors [0,128[ × [0,64[ silencieusement ignorées.
+/// Draws an individual pixel with automatic i32 clipping.
+/// Coordinates outside [0,128[ × [0,64[ are silently ignored.
 pub fn pixel(&mut self, x: i32, y: i32, on: bool)
 ```
 
@@ -155,8 +155,8 @@ pub fn line<I: I2c>(
 )
 ```
 
-Trace une ligne entre deux points quelconques.  
-Algorithme de **Bresenham** integer-only : aucune division flottante, safe sans FPU.
+Draws a line between any two points.  
+Integer-only **Bresenham** algorithm: no floating-point division, safe on MCUs without an FPU.
 
 ---
 
@@ -171,8 +171,8 @@ pub fn circle<I: I2c>(
 )
 ```
 
-Trace le contour d'un cercle.  
-Algorithme **midpoint** 8-octants : 8 pixels symétriques par itération.
+Draws a circle outline.  
+8-octant **midpoint** algorithm: 8 symmetric pixels per iteration.
 
 ---
 
@@ -187,7 +187,7 @@ pub fn fill_circle<I: I2c>(
 )
 ```
 
-Remplit un disque par balayage de lignes horizontales symétriques.
+Fills a disk by drawing symmetric horizontal scanlines.
 
 ---
 
@@ -203,7 +203,7 @@ pub fn triangle<I: I2c>(
 )
 ```
 
-Trace le contour d'un triangle via trois appels à `line()`.
+Draws a triangle outline using three calls to `line()`.
 
 ---
 
@@ -218,7 +218,7 @@ pub fn ellipse<I: I2c>(
 )
 ```
 
-Trace le contour d'une ellipse. Algorithme midpoint généralisé, integer-only.
+Draws an ellipse outline using a generalized, integer-only midpoint algorithm.
 
 ---
 
@@ -235,7 +235,7 @@ pub fn bezier_quad<I: I2c>(
 )
 ```
 
-Trace une courbe de Bézier quadratique via De Casteljau integer-only.
+Draws a quadratic Bézier curve using integer-only De Casteljau subdivision.
 
 ---
 
@@ -251,13 +251,13 @@ pub fn fill_triangle<I: I2c>(
 )
 ```
 
-Remplit un triangle plein par scanline integer-only.
+Fills a triangle using an integer-only scanline algorithm.
 
 ---
 
-## Exemples
+## Examples
 
-### Animation bras rotatif (avec `embedded-trig-f32`)
+### Rotating arm animation (with `embedded-trig-f32`)
 
 ```rust
 use embedded_trig_f32::{sin, cos};
@@ -281,17 +281,17 @@ loop {
 }
 ```
 
-### Barre de progression (driver seul, pas besoin de ce crate)
+### Progress bar (driver only; this crate is not needed)
 
 ```rust
-// draw_filled_rect est déjà dans le driver
+// draw_filled_rect is already provided by the driver
 oled.draw_rect(10, 28, 108, 8, true);
 oled.draw_filled_rect(11, 29, filled, 6, true);
 ```
 
 ---
 
-## Compatibilité
+## Compatibility
 
 | Crate | Version |
 |---|---|
@@ -299,27 +299,27 @@ oled.draw_filled_rect(11, 29, filled, 6, true);
 | `embedded-hal-async` | 1.0 |
 | Rust edition | 2024 |
 
-Testé sur : **RP2040**, **RP2350**, (via Embassy).
+Tested on: **RP2040**, **RP2350** (via Embassy).
 
 ---
 
-## 📋 Historique (Changelog)
+## 📋 Changelog
 
-**v0.2.0** : découpage modulaire du crate (`context`, `line`, `circle`, `triangle`,
-`ellipse`, `bezier`), mise à jour de la dépendance `embassy-ssd1306` vers `0.7.0`.
+**v0.2.0**: Split the crate into modules (`context`, `line`, `circle`, `triangle`,
+`ellipse`, `bezier`) and updated the `embassy-ssd1306` dependency to `0.7.0`.
 
-**v0.1.0** : version initiale  `line`, `circle`, `fill_circle`, `triangle`,
-`fill_triangle`, `ellipse`, `bezier_quad`.
-
----
-
-## Licence
-
-Distribué sous licence **GNU GPL v2.0 ou ultérieure**.  
-Voir [LICENSE](LICENSE) pour le texte complet.
+**v0.1.0**: Initial release with `line`, `circle`, `fill_circle`, `triangle`,
+`fill_triangle`, `ellipse`, and `bezier_quad`.
 
 ---
 
-## Auteur
+## License
+
+Distributed under the **GNU GPL v2.0 or later** license.  
+See [LICENSE](LICENSE) for the full text.
+
+---
+
+## Author
 
 **Jorge Andre Castro**

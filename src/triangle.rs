@@ -1,11 +1,11 @@
-//! Triangle  contour via 3 lignes, remplissage via scanline.
+//! Triangle outline using 3 lines; filling using scanlines.
 
 use crate::{line, Graphics};
 use embedded_hal_async::i2c::I2c;
 
-/// Trace le **contour** d'un triangle défini par trois sommets.
+/// Draws the **outline** of a triangle defined by three vertices.
 ///
-/// Implémenté comme trois appels à [`crate::line()`], aucune logique propre.
+/// Implemented as three calls to [`crate::line()`], with no additional logic.
 ///
 /// # Exemple
 ///
@@ -25,11 +25,11 @@ pub fn triangle<I: I2c>(
     line(gfx, x2, y2, x0, y0, on);
 }
 
-/// **Remplit** un triangle défini par trois sommets.
+/// **Fills** a triangle defined by three vertices.
 ///
-/// **Algorithme :** scanline  tri des sommets par Y, puis
-/// interpolation linéaire integer-only des bords gauche/droit
-/// à chaque rangée horizontale.
+/// **Algorithm:** scanline; sort the vertices by Y, then
+/// linearly interpolate the left and right edges using integer arithmetic
+/// for each horizontal row.
 ///
 /// # Exemple
 ///
@@ -43,7 +43,7 @@ pub fn fill_triangle<I: I2c>(
     x2: i32, mut y2: i32,
     on: bool,
 ) {
-    // Tri des sommets par Y croissant (bubble sort sur 3 éléments)
+    // Sort vertices by ascending Y (bubble sort on 3 elements)
     let (mut x0, mut x1, mut x2) = (x0, x1, x2);
     if y0 > y1 { core::mem::swap(&mut y0, &mut y1); core::mem::swap(&mut x0, &mut x1); }
     if y1 > y2 { core::mem::swap(&mut y1, &mut y2); core::mem::swap(&mut x1, &mut x2); }
@@ -51,7 +51,7 @@ pub fn fill_triangle<I: I2c>(
 
     let total_h = y2 - y0;
     if total_h == 0 {
-        // Triangle dégénéré — tracer une seule ligne
+        // Degenerate triangle — draw a single line
         let xmin = x0.min(x1).min(x2);
         let xmax = x0.max(x1).max(x2);
         for x in xmin..=xmax {
@@ -63,10 +63,10 @@ pub fn fill_triangle<I: I2c>(
     let upper_h = y1 - y0;
     let lower_h = y2 - y1;
 
-    // Moitié supérieure : y0 → y1
+    // Upper half: y0 → y1
     for y in y0..=y1 {
         let dy = y - y0;
-        // Interpolation integer-only ×total_h pour éviter la division
+        // Integer-only interpolation scaled by total_h to avoid division
         let xa = x0 + (x2 - x0) * dy / total_h;
         let xb = if upper_h == 0 {
             x1
@@ -79,7 +79,7 @@ pub fn fill_triangle<I: I2c>(
         }
     }
 
-    // Moitié inférieure : y1 → y2
+    // Lower half: y1 → y2
     for y in y1..=y2 {
         let dy = y - y0;
         let xa = x0 + (x2 - x0) * dy / total_h;
