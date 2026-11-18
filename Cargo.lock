@@ -25,17 +25,18 @@ dependencies = [
 
 [[package]]
 name = "embassy-ssd1306"
-version = "0.7.0"
+version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d469f4dfb6e3c640d2da4e169bb66d1efea3256db0f61db72747e487259ff229"
+checksum = "e70c2bdeea556334e96d348583802e41b47c52ac6d03eb34225ed066b0e89768"
 dependencies = [
  "embassy-time",
+ "embassy-time-riscv",
  "embedded-hal-async",
 ]
 
 [[package]]
 name = "embassy-ssd1306-graphics"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "embassy-ssd1306",
  "embedded-hal-async",
@@ -64,6 +65,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ee71af1b3a0deaa53eaf2d39252f83504c853646e472400b763060389b9fcc9"
 dependencies = [
  "document-features",
+]
+
+[[package]]
+name = "embassy-time-driver-riscv"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f6d47929d0b15763ffacee2da30e4775abaa35b60a457cb613a64e7694a8fbe"
+dependencies = [
+ "document-features",
+]
+
+[[package]]
+name = "embassy-time-riscv"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6b49ced5e955b61614073eba62242fa90c702dbed29045c4610d0f7bb6ea11ef"
+dependencies = [
+ "critical-section",
+ "document-features",
+ "embassy-time-driver-riscv",
+ "embedded-hal 0.2.7",
+ "embedded-hal 1.0.0",
+ "embedded-hal-async",
+ "futures-core",
 ]
 
 [[package]]

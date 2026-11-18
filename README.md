@@ -59,6 +59,25 @@ embassy-ssd1306-graphics = "0.2"
 
 ---
 
+## RISC-V support
+
+The crate can be used on RISC-V microcontrollers with Embassy. Its graphics
+algorithms are integer-only and do not depend on floating-point hardware.
+
+Use the `time-riscv` feature to select the RISC-V Embassy time backend:
+
+```toml
+[dependencies]
+embassy-ssd1306 = { version = "0.7", default-features = false }
+embassy-ssd1306-graphics = { version = "0.2", default-features = false, features = ["time-riscv"] }
+```
+
+The time backends are alternatives: use `time-riscv` for RISC-V builds and
+`time-upstream` (enabled by default) for standard Embassy builds. Do not enable
+both time backends together.
+
+---
+
 ## Quick start
 
 ```rust

@@ -1,23 +1,37 @@
+
 [package]
-name          = "embassy-ssd1306-graphics"
-version       = "0.2.1"
-edition       = "2024"
-authors       = ["Jorge Andre Castro <georgeandrec@gmail.com>"]
-license       = "GPL-2.0-or-later"
-description   = "no_std graphics primitives for SSD1306 OLED displays, adding lines, circles, ellipses, triangles, and Bézier curves without unsafe code or allocation"
-repository    = "https://github.com/jorgeandrecastro/embassy-ssd1306-graphics"
+name = "embassy-ssd1306-graphics"
+version = "0.2.2"
+edition = "2024"
+authors = ["Jorge Andre Castro <georgeandrec@gmail.com>"]
+license = "GPL-2.0-or-later"
+description = "no_std graphics primitives for SSD1306 OLED displays, adding lines, circles, ellipses, triangles, and Bézier curves without unsafe code or allocation"
+repository = "https://github.com/jorgeandrecastro/embassy-ssd1306-graphics"
 documentation = "https://docs.rs/embassy-ssd1306-graphics"
-readme        = "README.md"
-keywords      = ["embedded", "graphics", "ssd1306", "no-std", "oled"]
-categories    = ["embedded", "no-std", "graphics"]
+readme = "README.md"
+keywords = ["embedded", "graphics", "ssd1306", "no-std", "oled"]
+categories = ["embedded", "no-std", "graphics"]
+
+[features]
+default = ["time-upstream"]
+
+# Standard Embassy time backend
+time-upstream = ["embassy-ssd1306/time-upstream"]
+
+# RISC-V backend
+time-riscv = ["embassy-ssd1306/time-riscv"]
 
 [dependencies]
-embassy-ssd1306    = "0.7"
-embedded-hal-async = "1.0"
+embassy-ssd1306 = {
+    version = "0.7.2",
+    default-features = false
+}
+
+embedded-hal-async = { version = "1.0", default-features = false }
 
 [profile.release]
-opt-level     =  "z"
-lto           = true
+opt-level = "z"
+lto = true
 codegen-units = 1
-panic         = "abort"
-strip         = true
+panic = "abort"
+strip = true
