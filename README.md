@@ -310,17 +310,6 @@ oled.draw_filled_rect(11, 29, filled, 6, true);
 
 ---
 
-## Compatibility
-
-| Crate | Version |
-|---|---|
-| `embassy-ssd1306` | 0.7.0 |
-| `embedded-hal-async` | 1.0 |
-| Rust edition | 2024 |
-
-Tested on: **RP2040**, **RP2350** (via Embassy).
-
----
 
 ## 📋 Changelog
 

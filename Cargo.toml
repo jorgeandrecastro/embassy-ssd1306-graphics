@@ -1,7 +1,7 @@
 
 [package]
 name = "embassy-ssd1306-graphics"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2024"
 authors = ["Jorge Andre Castro <georgeandrec@gmail.com>"]
 license = "GPL-2.0-or-later"
